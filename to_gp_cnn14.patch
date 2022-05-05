@@ -1,0 +1,84 @@
+--- a/gp_cnn14.py	2022-05-05 09:16:17.606957245 +0900
++++ b/gp_cnn14.py	2022-05-05 15:37:29.354747673 +0900
+@@ -1,4 +1,7 @@
+-"""CNN14 network, decoupled from Spectrogram, LogmelFilterBank, SpecAugmentation, and classifier head.
++"""General-purpose (calculation) of PANNs' CNN14.
++
++Implemented based on https://github.com/daisukelab/sound-clf-pytorch/blob/master/for_evar/cnn14_decoupled.py,
++which is a CNN14 network, decoupled from Spectrogram, LogmelFilterBank, SpecAugmentation, and classifier head.
+ 
+ ## Reference
+ - [1] https://arxiv.org/abs/1912.10211 "PANNs: Large-Scale Pretrained Audio Neural Networks for Audio Pattern Recognition"
+@@ -163,3 +166,72 @@
+         embedding = self.temporal_pooling(x)
+ 
+         return embedding
++
++
++def reshape_along_time(x):
++    x = x.transpose(2, 3)    # (B, C, T, F) -> (B, C, F, T)
++    B, C, F, T = x.shape
++    x = x.reshape(B, C*F, T) # (B, D=C*F, T)
++    return x                 # (B, D, T)
++
++
++def mean_max_pooling(frame_embeddings, dim=-1):
++    assert len(frame_embeddings.shape) == 3 # Batch,Feature Dimension,Time
++    (x1, _) = torch.max(frame_embeddings, dim=dim)
++    x2 = torch.mean(frame_embeddings, dim=dim)
++    x = x1 + x2
++    return x
++
++
++class GeneralPurposeCnn14(Cnn14_Decoupled):
++
++    def encode_frame(self, x, layers=[3, 6]):
++        x = x.transpose(1, 3)
++        x = self.bn0(x)
++        x = x.transpose(1, 3)
++
++        outputs = []
++        x = self.conv_block1(x, pool_size=(2, 2), pool_type='avg')
++        x = F.dropout(x, p=0.2, training=self.training)
++        if 1 in layers:
++            outputs.append(F.max_pool2d(x, kernel_size=(16, 1)))  # [-1, 256, T, 32] -> [-1, 256, T/16, 32]
++        x = self.conv_block2(x, pool_size=(2, 2), pool_type='avg')
++        x = F.dropout(x, p=0.2, training=self.training)
++        if 2 in layers:
++            outputs.append(F.max_pool2d(x, kernel_size=(8, 1)))  # [-1, 256, T/2, 16] -> [-1, 256, T/16, 16]
++        x = self.conv_block3(x, pool_size=(2, 2), pool_type='avg')
++        x = F.dropout(x, p=0.2, training=self.training)
++        if 3 in layers:
++            outputs.append(F.max_pool2d(x, kernel_size=(4, 1)))  # [-1, 256, T/4, 8] -> [-1, 256, T/16, 8]
++        x = self.conv_block4(x, pool_size=(2, 2), pool_type='avg')
++        x = F.dropout(x, p=0.2, training=self.training)
++        if 4 in layers:
++            outputs.append(F.max_pool2d(x, kernel_size=(2, 1)))  # [-1, 256, T/8, 4] -> [-1, 256, T/16, 4]
++        x = self.conv_block5(x, pool_size=(2, 2), pool_type='avg')
++        x = F.dropout(x, p=0.2, training=self.training)
++        if 5 in layers:
++            outputs.append(x.clone())
++        x = self.conv_block6(x, pool_size=(1, 1), pool_type='avg')
++        x = F.dropout(x, p=0.2, training=self.training)
++        if 6 in layers:
++            outputs.append(x.clone())
++
++        # Fuse layer outputs
++        xs = [reshape_along_time(_x) for _x in outputs] # (B, T, C, F) -> (B, D, T)
++        return torch.hstack(xs)                         # (B, D'=sum(all Di), T)
++
++    def forward(self, x, layers=[3, 6]):
++        """Encode log mel-spectrogram [B, 1, T, 64] input into [B, 6144] if layers=[3, 6]."""
++
++        x = self.encode_frames(x, layers=layers)
++        x = mean_max_pooling(x)
++        return x
++
++
++if __name__ == '__main__':
++    # test
++    model = GeneralPurposeCnn14()
++    print('x = torch.rand(32, 1, 512, 64)')
++    x = torch.rand(32, 1, 512, 64)
++    print('GeneralPurposeCnn14(x) => [B, D]:', model(x).shape)
++    print('GeneralPurposeCnn14.encode_frames(x) => [B, D, T]:', model.encode_frames(x).shape)

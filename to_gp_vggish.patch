@@ -1,0 +1,107 @@
+--- a/gp_vggish.py	2022-05-05 08:54:00.695091067 +0900
++++ b/gp_vggish.py	2022-05-05 09:34:36.887233831 +0900
+@@ -1,9 +1,20 @@
++"""General-purpose VGGish.
++
++Implemented based on the VGGish model by [tcvrick](https://github.com/tcvrick).
++"""
++
++import torch
+ import torch.nn as nn
++import torch.nn.functional as F
+ 
+ 
+ class VGGish(nn.Module):
+     """
+-    PyTorch implementation of the VGGish model.
++    PyTorch implementation of the VGGish model by [tcvrick](https://github.com/tcvrick).
++    Cloned from: https://github.com/tcvrick/audioset-vggish-tensorflow-to-pytorch/blob/master/vggish.py
++    (The original comment follows)
++
++    PyTorch implementation of the VGGish model
+ 
+     Adapted from: https://github.com/harritaylor/torch-vggish
+     The following modifications were made: (i) correction for the missing ReLU layers, (ii) correction for the
+@@ -50,9 +61,77 @@
+         return x
+ 
+ 
+-def main():
+-    pass
++def mean_max_pooling(frame_embeddings, dim=-1):
++    assert len(frame_embeddings.shape) == 3 # Batch,Feature Dimension,Time
++    (x1, _) = torch.max(frame_embeddings, dim=dim)
++    x2 = torch.mean(frame_embeddings, dim=dim)
++    x = x1 + x2
++    return x
++
++
++class GeneralPurposeVGGish(VGGish):
++    """General-purpose version of the VGGish model.
++
++    This version calculates features:
++    - Flattened along time-frames,
++    - Fusing multi-layer outputs.
++    """
++
++    def encode_frames(self, x, layers=[9, 14]):
++        """Encode log mel-spectrogram [B, 1, 96, 64] input to time-frame features [B, 8192, 6].
++
++        Args:
++            x: [B, 1, 96, 64] batch input log mel-spectrogram.
++            layers: List of layer numbers. Expected numbers $\in [1, 4, 7, 9, 12, 14, 17, 19, 21]$
++        """
++
++        # Conv block layers
++        maxpool_layers = [2, 5, 10, 15]
++        features, stride = [], 16
++        for l, m in enumerate(self.features.children()):
++            x = m(x)
++            if l in maxpool_layers:
++                stride = stride // 2
++            if l in layers:
++                x_cur = F.max_pool2d(x, kernel_size=(stride, 1), stride=(stride, 1)) if stride > 1 else x.clone()
++                B, xC, xT, xF = x_cur.shape
++                x_cur = x_cur.transpose(2, 3).reshape(B, xC*xF, xT)
++                features.append(x_cur)
++        # FC block
++        fc1_1, relu1_1, fc1_2, relu1_2, fc2, relu2 = list(self.fc.children())
++        x = x.permute(0, 2, 3, 1).contiguous()
++        x = x.view(x.size(0), -1)
++        x = fc1_1(x)
++        x = relu1_1(x)
++        if 17 in layers:
++            x_cur = x.unsqueeze(-1).expand(-1, -1, 6)
++            features.append(x_cur)
++        x = fc1_2(x)
++        x = relu1_2(x)
++        if 19 in layers:
++            x_cur = x.unsqueeze(-1).expand(-1, -1, 6)
++            features.append(x_cur)
++        x = fc2(x)
++        x = relu2(x)
++        if 21 in layers:
++            x_cur = x.unsqueeze(-1).expand(-1, -1, 6)
++            features.append(x_cur)
++        # fusion -> [B, *, 6]
++        x = torch.hstack(features)
++        return x
++
++    def forward(self, x, layers=[9, 14]):
++        """Encode log mel-spectrogram [B, 1, 96, 64] input to feature vectors [B, 8192]."""
++
++        x = self.encode_frames(x, layers=layers)
++        x = mean_max_pooling(x)
++        return x
+ 
+ 
+ if __name__ == '__main__':
+-    main()
++    # test
++    model = GeneralPurposeVGGish()
++    print('x = torch.rand(32, 1, 96, 64)')
++    x = torch.rand(32, 1, 96, 64)
++    print('GeneralPurposeVGGish(x) => [B, D]:', model(x).shape)
++    print('GeneralPurposeVGGish.encode_frames(x) => [B, D, T]:', model.encode_frames(x).shape)
++    print('GeneralPurposeVGGish(x, layers=[1,7,14,21]) => [B, D]:', model(x, layers=[1, 7, 14, 21]).shape)
++    print('GeneralPurposeVGGish.encode_frames(x, layers=[1,7,14,21]) => [B, D, T]:', model.encode_frames(x, layers=[1, 7, 14, 21]).shape)
