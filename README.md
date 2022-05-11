@@ -10,14 +10,26 @@ The command lines for reproducing all the results on the paper are also availabl
 If you find our study useful, please consider citing our paper. The following is the BibTeX entry for citation (will be updated shortly).
 
 ```BibTeX
-@inproceedings{niizumi2022composing,
-      title={Composing General Audio Representation by Fusing Multilayer Features of a Pre-trained Model}, 
-      author={Daisuke Niizumi and Daiki Takeuchi and Yasunori Ohishi and Noboru Harada and Kunio Kashino},
-      booktitle = {T.B.D.},
-      year={2021},
-      eprint={T.B.D.},
-      archivePrefix={arXiv},
-      primaryClass={eess.AS}
+@techreport{niizumi2022composing,
+	author		= "仁泉大輔 and 竹内大起 and 大石康智 and 原田登 and 柏野邦夫",
+	title		= "事前学習モデルの複数層特徴量の融合を用いた汎用音響信号表現",
+	booktitle	= "信学技報 (EA2022-9)",
+	volume		= "122",
+	number		= "20",
+	pages		= "41--45",
+	month		= "May",
+	year		= "2022"
+}
+```
+
+```BibTeX
+@article{niizumi2022composing,
+    title		= {Composing General Audio Representation by Fusing Multilayer Features of a Pre-trained Model},
+    author		= {Daisuke Niizumi and Daiki Takeuchi and Yasunori Ohishi and Noboru Harada and Kunio Kashino},
+    journal		= {T.B.D.},
+    year		= {2022},
+    archivePrefix = {arXiv},
+    primaryClass = {T.B.D.}
 }
 ```
 
@@ -53,20 +65,20 @@ This repository relies on some external codes, especially our evaluation package
 ### 2-1. Setup repository contents
 
 ```sh
-echo "Make gp_vggish.py and clone cnn14_decoupled.py (used by gp_cnn14.py)."
+echo "Preparing gp_vggish.py and clone cnn14_decoupled.py (used by gp_cnn14.py)."
 curl https://raw.githubusercontent.com/tcvrick/audioset-vggish-tensorflow-to-pytorch/master/vggish.py -o gp_vggish.py
 patch -p1 < to_gp_vggish.patch
 curl https://raw.githubusercontent.com/daisukelab/sound-clf-pytorch/master/for_evar/cnn14_decoupled.py -o gp_cnn14.py
 patch -p1 < to_gp_cnn14.patch
 
-echo "Setup EVAR (nttcslab/eval-audio-repr)."
+echo "Preparing EVAR (nttcslab/eval-audio-repr)."
 git clone https://github.com/nttcslab/eval-audio-repr.git evar
 cd evar
 curl https://raw.githubusercontent.com/daisukelab/general-learning/master/MLP/torch_mlp_clf2.py -o evar/utils/torch_mlp_clf2.py
 curl https://raw.githubusercontent.com/daisukelab/sound-clf-pytorch/master/for_evar/sampler.py -o evar/sampler.py
 curl https://raw.githubusercontent.com/daisukelab/sound-clf-pytorch/master/for_evar/cnn14_decoupled.py -o evar/cnn14_decoupled.py
 
-echo "Setup and download pre-trained weights for VGGish and AST."
+echo "Preparing and download pre-trained weights for VGGish and AST."
 cd external
 git clone https://github.com/tcvrick/audioset-vggish-tensorflow-to-pytorch.git tcvrick_vggish
 sed -i 's/from audioset import/from \. import/' tcvrick_vggish/audioset/vggish_input.py
