@@ -65,7 +65,7 @@ This repository relies on some external codes, especially our evaluation package
 ### 2-1. Setup repository contents
 
 ```sh
-echo "Preparing gp_vggish.py and clone cnn14_decoupled.py (used by gp_cnn14.py)."
+echo "Preparing gp_vggish.py and gp_cnn14.py."
 curl https://raw.githubusercontent.com/tcvrick/audioset-vggish-tensorflow-to-pytorch/master/vggish.py -o gp_vggish.py
 patch -p1 < to_gp_vggish.patch
 curl https://raw.githubusercontent.com/daisukelab/sound-clf-pytorch/master/for_evar/cnn14_decoupled.py -o gp_cnn14.py
@@ -157,9 +157,9 @@ We use a wrapper class `AR_AST_Fusion` (to_evar/evar/ar_ast_ext.py).
 For reproducing results in the paper, use the command lines in [CommandLines.md](CommandLines.md).
 
 You will need to setup all the models and datasets in your copy of [EVAR](https://github.com/nttcslab/eval-audio-repr).
-See EVAR documents, `evar/README.md`, and `evar/Preparing-datasets.md` for more information.
+See EVAR documents, `evar/README.md`, `evar/Preparing-models.md`, and `evar/Preparing-datasets.md` for more information.
 
-If you could successfully prepare all stuff, the following example to test Cnn14-Fusion on the CREMA-D will result in an accuracy of about 58~59%.
+If you could successfully prepare all the stuff, the following example to test Cnn14-Fusion on the CREMA-D will result in an accuracy of about 58~59%.
 
 ```sh
 cd evar
