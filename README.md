@@ -11,8 +11,8 @@ If you find our study useful, please consider citing our paper. The followings a
 
 ```BibTeX
 @inproceedings{niizumi2022composing,
-    title		= {Composing General Audio Representation by Fusing Multilayer Features of a Pre-trained Model},
-    author		= {Daisuke Niizumi and Daiki Takeuchi and Yasunori Ohishi and Noboru Harada and Kunio Kashino},
+    title       = {Composing General Audio Representation by Fusing Multilayer Features of a Pre-trained Model},
+    author      = {Daisuke Niizumi and Daiki Takeuchi and Yasunori Ohishi and Noboru Harada and Kunio Kashino},
     booktitle   = {2022 30th European Signal Processing Conference (EUSIPCO)},
     year        = {2022},
     url         = {https://arxiv.org/abs/2205.08138}
@@ -21,14 +21,14 @@ If you find our study useful, please consider citing our paper. The followings a
 
 ```BibTeX
 @techreport{niizumi2022composing,
-	author		= "仁泉大輔 and 竹内大起 and 大石康智 and 原田登 and 柏野邦夫",
-	title		= "事前学習モデルの複数層特徴量の融合を用いた汎用音響信号表現",
-	booktitle	= "信学技報 (EA2022-9)",
-	volume		= "122",
-	number		= "20",
-	pages		= "41--45",
-	month		= "May",
-	year		= "2022",
+    author      = "仁泉大輔 and 竹内大起 and 大石康智 and 原田登 and 柏野邦夫",
+    title       = "事前学習モデルの複数層特徴量の融合を用いた汎用音響信号表現",
+    booktitle   = "信学技報 (EA2022-9)",
+    volume      = "122",
+    number      = "20",
+    pages       = "41--45",
+    month       = "May",
+    year        = "2022",
     url         = {https://www.ieice.org/ken/paper/20220513BCK3/}
 }
 ```
