@@ -7,7 +7,17 @@ This repository offers implementation of our paper "Composing General Audio Repr
 The VGGish-Fusion and CNN14-Fusion classes are available not only for reproduction but also for your application studies.
 The command lines for reproducing all the results on the paper are also available.
 
-If you find our study useful, please consider citing our paper. The following is the BibTeX entry for citation (will be updated shortly).
+If you find our study useful, please consider citing our paper. The followings are BibTeX entries for citation.
+
+```BibTeX
+@inproceedings{niizumi2022composing,
+    title		= {Composing General Audio Representation by Fusing Multilayer Features of a Pre-trained Model},
+    author		= {Daisuke Niizumi and Daiki Takeuchi and Yasunori Ohishi and Noboru Harada and Kunio Kashino},
+    booktitle   = {2022 30th European Signal Processing Conference (EUSIPCO)},
+    year        = {2022},
+    url         = {https://arxiv.org/abs/2205.08138}
+}
+```
 
 ```BibTeX
 @techreport{niizumi2022composing,
@@ -18,18 +28,8 @@ If you find our study useful, please consider citing our paper. The following is
 	number		= "20",
 	pages		= "41--45",
 	month		= "May",
-	year		= "2022"
-}
-```
-
-```BibTeX
-@article{niizumi2022composing,
-    title		= {Composing General Audio Representation by Fusing Multilayer Features of a Pre-trained Model},
-    author		= {Daisuke Niizumi and Daiki Takeuchi and Yasunori Ohishi and Noboru Harada and Kunio Kashino},
-    journal		= {T.B.D.},
-    year		= {2022},
-    archivePrefix = {arXiv},
-    primaryClass = {T.B.D.}
+	year		= "2022",
+    url         = {https://www.ieice.org/ken/paper/20220513BCK3/}
 }
 ```
 
