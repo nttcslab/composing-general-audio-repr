@@ -20,7 +20,7 @@ class AR_Cnn14_Fusion(AR_Cnn14):
         layers = [layers] if isinstance(layers, (int)) else layers
 
         x = self.feature_extractor(batch_audio)            # (B, 1, T, F(mel_bins))
-        x = self.body.encode_frame(x, layers=layers)       # (B, D, T)
+        x = self.body.encode_frames(x, layers=layers)       # (B, D, T)
         return x
 
     def forward(self, batch_audio):
