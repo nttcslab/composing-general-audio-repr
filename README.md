@@ -2,6 +2,18 @@
 
 # Composing General Audio Representation by Fusing Multilayer Features of a Pre-trained Model
 
+---
+## What's NEW?
+
+- Tutorials are ready!
+    - [Tutorial1-Encoding-Audio-BYOL-A.ipynb](tutorial/Tutorial1-Encoding-Audio-BYOL-A.ipynb) - Shows basic steps for getting audio features with BYOL-A.
+    - [Tutorial2-Visualize-Audios-BYOL-A.ipynb](tutorial/Tutorial2-Visualize-Audios-BYOL-A.ipynb) - Visualize BYOL-A features of audios with pitch and amplitude changes. 
+    - [Tutorial3-Try-VGGish-Variants.ipynb](tutorial/Tutorial3-Try-VGGish-Variants.ipynb) - Shows basic steps of VGGish and VGGish-Fusion.
+    - [Tutorial4-Try-CNN14-Variants.ipynb](tutorial/Tutorial4-Try-CNN14-Variants.ipynb) - Shows basic steps of CNN14 and CNN14-Fusion.
+    - [Tutorial5-Visualize-Dataset-Samples.ipynb](tutorial/Tutorial5-Visualize-Dataset-Samples.ipynb) - Visualizes US8K and CREMA-D using features extracted by BYOL-A, VGGish, and CNN14.
+
+---
+
 This repository offers implementation of our paper "Composing General Audio Representation by Fusing Multilayer Features of a Pre-trained Model."
 
 The VGGish-Fusion and CNN14-Fusion classes are available not only for reproduction but also for your application studies.
@@ -64,49 +76,8 @@ This repository relies on some external codes, especially our evaluation package
 
 ### 2-1. Setup repository contents
 
-```sh
-echo "Preparing gp_vggish.py and gp_cnn14.py."
-curl https://raw.githubusercontent.com/tcvrick/audioset-vggish-tensorflow-to-pytorch/master/vggish.py -o gp_vggish.py
-patch -p1 < to_gp_vggish.patch
-curl https://raw.githubusercontent.com/daisukelab/sound-clf-pytorch/master/for_evar/cnn14_decoupled.py -o gp_cnn14.py
-patch -p1 < to_gp_cnn14.patch
-
-echo "Preparing EVAR (nttcslab/eval-audio-repr)."
-git clone https://github.com/nttcslab/eval-audio-repr.git evar
-cd evar
-curl https://raw.githubusercontent.com/daisukelab/general-learning/master/MLP/torch_mlp_clf2.py -o evar/utils/torch_mlp_clf2.py
-curl https://raw.githubusercontent.com/daisukelab/sound-clf-pytorch/master/for_evar/sampler.py -o evar/sampler.py
-curl https://raw.githubusercontent.com/daisukelab/sound-clf-pytorch/master/for_evar/cnn14_decoupled.py -o evar/cnn14_decoupled.py
-
-echo "Preparing and download pre-trained weights for VGGish and AST."
-cd external
-git clone https://github.com/tcvrick/audioset-vggish-tensorflow-to-pytorch.git tcvrick_vggish
-sed -i 's/from audioset import/from \. import/' tcvrick_vggish/audioset/vggish_input.py
-wget https://github.com/tcvrick/audioset-vggish-tensorflow-to-pytorch/releases/download/v0.1/pytorch_vggish.zip
-unzip pytorch_vggish.zip
-cd ..
-cd external/
-git clone https://github.com/YuanGongND/ast.git
-patch -p1 < ast_models.patch
-pip install wget
-cd ..
-
-echo "Adding VGGish, CNN14, and AST extensions to the EVAR folder."
-sed -i 's/import evar.ar_cnn14/import evar.ar_cnn14, evar.ar_cnn14_ext/' lineareval.py
-sed -i 's/import evar.ar_vggish/import evar.ar_vggish, evar.ar_vggish_ext/' lineareval.py
-sed -i 's/import evar.ar_ast/import evar.ar_ast, evar.ar_ast_ext/' lineareval.py
-ln -s ../../gp_cnn14.py evar
-ln -s ../../gp_vggish.py evar
-ln -s ../../cnn14_decoupled.py evar
-ln -s ../../to_evar/evar/ar_ast_ext.py evar
-ln -s ../../to_evar/evar/ar_cnn14_ext.py evar
-ln -s ../../to_evar/evar/ar_vggish_ext.py evar
-ln -s ../../to_evar/config/cnn14_fusion.yaml config
-ln -s ../../to_evar/config/ast_fusion.yaml config
-ln -s ../../to_evar/config/vggish_fusion.yaml config
-ln -s ../../to_evar/config/vggish_fusion919.yaml config
-cd ..
-```
+Run the steps in [Setup-commands.txt](Setup-commands.txt).
+It will make external files downloaded and modified accordingly under a new folder, `evar`.
 
 ### 2-2. Setup data
 
