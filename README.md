@@ -25,8 +25,9 @@ If you find our study useful, please consider citing our paper. The followings a
 @inproceedings{niizumi2022composing,
     title       = {Composing General Audio Representation by Fusing Multilayer Features of a Pre-trained Model},
     author      = {Daisuke Niizumi and Daiki Takeuchi and Yasunori Ohishi and Noboru Harada and Kunio Kashino},
-    booktitle   = {2022 30th European Signal Processing Conference (EUSIPCO)},
+    booktitle   = {2022 30th European Signal Processing Conference (EUSIPCO)}, 
     year        = {2022},
+    pages       = {200-204},
     url         = {https://arxiv.org/abs/2205.08138}
 }
 ```
